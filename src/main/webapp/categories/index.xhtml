@@ -1,0 +1,138 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>CATEGORIES CRUD</title>
+</h:head>
+<!-- ************************************************** --> 
+<!-- Reemplazar el studentView por el View implementado --> 
+<!-- ************************************************** -->
+<h:body>
+<p:toolbar>
+	<p:toolbarGroup><h2>CATEGORIES CRUD</h2></p:toolbarGroup>
+</p:toolbar>
+<h:form>
+    <div class="card">
+    	<p:growl id="messages" showDetail="true"/>
+    	<ui:insert name="header-data-table"></ui:insert>
+        <p:dataTable id="entityDataTable" widgetVar="entityDataTableWidget" var="entity" value="#{categoriesView.entities}" 
+        		selection="#{categoriesView.entitiesSelected}"  reflow="true"
+        		rowKey="#{entity.id}" paginator="true" paginatorPosition="bottom"
+        		rows="5" sortMode="single" allowUnsorting="true">
+        	
+        	<f:facet name="header">
+                <div class="table-header">
+                    <span class="filter-container ui-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        
+                      <!-- ************************************************** -->
+                      <!-- Reemplazar el value con el atributo a buscar -->						
+                        <p:inputText id="globalSearch" value="#{categoriesView.entitySearch.name}" placeholder="Search"/>
+                      <!-- ************************************************** -->
+                    
+                    </span>
+                    <p:commandButton value="Search" icon="pi pi-check" actionListener="#{categoriesView.searchEntity}"
+            			update="entityDataTable" process="globalSearch @this"/>
+            		<p:commandButton value="Show All" icon="pi pi-check" actionListener="#{categoriesView.getAllEntities}"
+            			update="entityDataTable" process="@this"/>
+
+                </div>
+            </f:facet>        	
+            
+        	<p:column selectionMode="Multiple" style="width:16px;text-align:center" />        	
+            <p:column headerText="Id" sortBy="#{entity.id}">
+                <h:outputText value="#{entity.id}" />
+            </p:column>
+            
+            <!-- **************************************************** -->
+            <!-- Colocar tantos p:column como atributos desee mostrar y reemplace los datos necesarios -->
+				<p:column headerText="Name" sortBy="#{entity.name}">
+					<h:outputText value="#{entity.name}" />
+				</p:column>
+				<p:column headerText="Description" sortBy="#{entity.description}">
+					<h:outputText value="#{entity.description}" />
+				</p:column>
+				<p:column headerText="UrlToImage" sortBy="#{entity.urlToImage}">
+					<h:outputText value="#{entity.urlToImage}" />
+				</p:column>
+				<p:column headerText="TrendRanking" sortBy="#{entity.trendRanking}">
+					<h:outputText value="#{entity.trendRanking}" />
+				</p:column>
+				<!-- **************************************************** -->
+            
+            <p:column>
+            	<p:commandButton icon="pi pi-pencil" oncomplete="PF('entityDialog').show()"
+            			styleClass="edit-button rounded-button ui-button-success" 
+            			update="@form:entity-content" process="@this">
+            		<f:setPropertyActionListener value="#{entity}" target="#{categoriesView.entitySelected}"/>
+            		<p:resetInput target="@form:entity-content"/>
+            	</p:commandButton>
+            	<p:commandButton icon="pi pi-trash" style="margin-left: 10px;"
+            			styleClass="rounded-button ui-button-danger" process="@this"
+            			oncomplete="PF('deleteDialog').show()">
+            		<f:setPropertyActionListener value="#{entity}" target="#{categoriesView.entitySelected}"/>
+            	</p:commandButton>
+            </p:column>
+            
+            <p:ajax event="rowSelectCheckbox" update="entity-button-delete entity-button-edit" />
+            <p:ajax event="rowUnselectCheckbox" update="entity-button-delete entity-button-edit" />
+            <p:ajax event="toggleSelect" update="entity-button-delete entity-button-edit" />            
+            
+            <f:facet name="footer">
+            	<p:commandButton process="entityDataTable" value="New" icon="pi pi-check" 
+            			actionListener="#{categoriesView.createNew}" update="@form:entity-content"
+            			oncomplete="PF('entityDialog').show()" styleClass="ui-button-raised ui-button-success" />
+            	
+            	<p:commandButton id="entity-button-edit" process="entityDataTable" value="Edit" icon="pi pi-check" 
+            			actionListener="#{categoriesView.editEntitySelected}" update="@form:entity-content"
+            			oncomplete="PF('entityDialog').show()" styleClass="ui-button-raised ui-button-help"
+            			disabled="#{!categoriesView.hasEntitySelected()}" />
+            	
+            	<p:commandButton id="entity-button-delete" process="entityDataTable" value="Delete" icon="pi pi-check" 
+            			oncomplete="PF('deleteDialog').show()" styleClass="ui-button-raised ui-button-danger"
+            			disabled="#{!categoriesView.hasEntitiesSelected()}" update="entityDataTable" />
+            </f:facet>
+        </p:dataTable>
+    </div>
+    
+    <p:dialog header="Entity" widgetVar="entityDialog" modal="true" showEffect="fade"
+    		minHeight="300" width="300" responsive="true">
+    	<p:outputPanel id="entity-content" class="ui-fluid">
+       		<div class="p-field">
+       		
+       		  <!-- **************************************************** -->
+              <!-- Colocar tantos p:outputLabel y p:inputText como atributos desee mostrar y reemplace los datos necesarios -->
+       			<p:outputLabel for="Name">Name:</p:outputLabel>
+       			  <p:inputText id="Name" value="#{categoriesView.entitySelected.name}" required="true"/>
+       			<p:outputLabel for="Description">Description:</p:outputLabel>
+       			  <p:inputText id="Description" value="#{categoriesView.entitySelected.description}" required="true"/>
+       			<p:outputLabel for="urlToImage">UrlToImage:</p:outputLabel>
+       			  <p:inputText id="urlToImage" value="#{categoriesView.entitySelected.urlToImage}" required="true"/>
+       			<p:outputLabel for="TrendRanking">TrendRanking:</p:outputLabel>
+       			  <p:inputText id="TrendRanking" value="#{categoriesView.entitySelected.trendRanking}" required="true"/>
+       		  <!-- **************************************************** -->
+       				
+            </div>
+        </p:outputPanel>  
+        <f:facet name="footer">
+         	<p:commandButton value="Save" icon="pi pi-check" actionListener="#{categoriesView.saveEntity}"
+            		update="entity-content entityDataTable" process="entity-content @this"/>
+         	<p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('entityDialog').hide()"
+            		class="ui-button-secondary"/>
+     	</f:facet>	
+    </p:dialog>
+    <p:confirmDialog id="prueba" widgetVar="deleteDialog" showEffect="fade" width="300"
+                     message="Delete the item?" header="Confirm" severity="warn">
+        <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{categoriesView.deleteEntity}"
+                         process="@this" oncomplete="PF('deleteDialog').hide()"
+                         update="entityDataTable @form:messages" />
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                         onclick="PF('deleteDialog').hide()"/>
+    </p:confirmDialog>
+</h:form>
+
+</h:body>
+</html>
